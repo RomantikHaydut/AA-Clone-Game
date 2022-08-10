@@ -13,6 +13,8 @@ TagManager:
   - Thrower
   - Touch Button
   - Purple_Background
+  - Purple Background
+  - Arrow Count Image
   layers:
   - Default
   - TransparentFX

@@ -10,6 +10,8 @@ public class SpawnManager : MonoBehaviour
 
     private GameObject projectile;
 
+    public GameObject[] arrowCountImages;
+
     private GameObject obstacle;
 
     private GameObject center;
@@ -164,8 +166,7 @@ public class SpawnManager : MonoBehaviour
             projectile = levelManager.projectile;
         }
 
-
-
+        CalculateArrowCount();
         Time.timeScale = 1f;
 
     }
@@ -186,6 +187,7 @@ public class SpawnManager : MonoBehaviour
             {
                 projectileText.text = "1 Arrow Left";
             }
+            DestroyArrowImage();
             canShoot = false;
 
         }
@@ -202,10 +204,31 @@ public class SpawnManager : MonoBehaviour
             {
                 projectileText.text = "1 Arrow Left";
             }
+            DestroyArrowImage();
             canShoot = false;
         }
 
     }
+
+    void CalculateArrowCount()
+    {
+        int y = 0;
+        for (int i = 1; i < arrowCountImages.Length +1; i++)
+        {
+            if (i >= LevelManager.projectileCount)
+            { 
+                Destroy(arrowCountImages[LevelManager.projectileCount + y]);
+                y++;
+            }
+        }
+    }
+
+    void DestroyArrowImage()
+    {
+        int index = LevelManager.projectileCount - sendedProjectile;
+        Destroy(arrowCountImages[index].gameObject);
+    }
+
 
     void SpawnProjectile(GameObject selectedProjectile)
     {
