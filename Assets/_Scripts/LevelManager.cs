@@ -24,7 +24,9 @@ public class LevelManager : MonoBehaviour
 
     public ParticleSystem badHitEffect;
 
-    public bool levelWin;
+    public static bool levelWin;
+
+    public static bool lastLevelWin;
 
     private AudioSource audio;
 
@@ -52,6 +54,8 @@ public class LevelManager : MonoBehaviour
 
     private void Start()
     {
+        GameManager.Instance.LoadLevel();
+
         if (GameManager.lastLevel > level)
         {
             level = GameManager.lastLevel;
@@ -60,7 +64,18 @@ public class LevelManager : MonoBehaviour
         {
             level = 1;
         }
+
+        if (level == 0)
+        {
+            level = 1;
+            FindObjectOfType<MenuManager>().buttonLevelText.text = "LeveL" + level;
+        }
+        else
+        {
+            FindObjectOfType<MenuManager>().buttonLevelText.text = "LeveL" + level;
+        }
     }
+
 
     private void Update()
     {
@@ -86,20 +101,27 @@ public class LevelManager : MonoBehaviour
 
     IEnumerator WaitWinScreen()
     {
-        yield return new WaitForSecondsRealtime(1.5f);
-        FindObjectOfType<SpawnManager>().gameWinPanel.SetActive(true);
-        FindObjectOfType<SpawnManager>().textBackground.SetActive(true);
+        lastLevelWin = true;
+        Destroy(FindObjectOfType<SpawnManager>().timeBar.transform.parent.gameObject);
+        yield return new WaitForSecondsRealtime(2f);
+        GoMenu();
         yield break;
     }
     IEnumerator WaitLoseScreen()
     {
-        yield return new WaitForSecondsRealtime(1.5f);
+        lastLevelWin = false;
+        Destroy(FindObjectOfType<SpawnManager>().timeBar.transform.parent.gameObject);
+        yield return new WaitForSecondsRealtime(2f);
         if (!levelWin)
         {
-            FindObjectOfType<SpawnManager>().gameOverPanel.SetActive(true);
-            FindObjectOfType<SpawnManager>().textBackground.SetActive(true);
+            GoMenu();
         }
         yield break;
+    }
+
+    public void StopSound()
+    {
+        audio.Stop();
     }
 
     public void PlayHitSound()
@@ -133,7 +155,7 @@ public class LevelManager : MonoBehaviour
     void GoLevelHack()
     {
 
-        if (Input.GetKeyDown(KeyCode.Alpha2) && hackLevel != 1)
+        if (Input.GetKeyDown(KeyCode.Alpha2) && hackLevel != 1 && hackLevel != 2)
         {
             hackLevel = 2;
         }
@@ -196,6 +218,18 @@ public class LevelManager : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Alpha7) && hackLevel == 1)
         {
             hackLevel = 17;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha8) && hackLevel == 1)
+        {
+            hackLevel = 18;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha7) && hackLevel == 1)
+        {
+            hackLevel = 19;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha0) && hackLevel == 2)
+        {
+            hackLevel = 20;
         }
         else if (Input.GetKeyDown(KeyCode.Alpha1) && hackLevel <= 9)
         {

@@ -292,7 +292,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.3
+  m_Time: 0.5
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -3840,7 +3840,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.3
+  m_Time: 0.5
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -4364,7 +4364,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.3
+  m_Time: 0.5
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1
@@ -6713,12 +6713,24 @@ PrefabInstance:
     m_TransformParent: {fileID: 1889870649498629114}
     m_Modifications:
     - target: {fileID: 7881065513688450684, guid: 2400ddc348718ce4b8a5031f7ab68b67, type: 3}
+      propertyPath: looping
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881065513688450684, guid: 2400ddc348718ce4b8a5031f7ab68b67, type: 3}
+      propertyPath: prewarm
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881065513688450684, guid: 2400ddc348718ce4b8a5031f7ab68b67, type: 3}
       propertyPath: lengthInSec
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 7881065513688450684, guid: 2400ddc348718ce4b8a5031f7ab68b67, type: 3}
       propertyPath: simulationSpeed
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7881065513688450684, guid: 2400ddc348718ce4b8a5031f7ab68b67, type: 3}
+      propertyPath: startDelay.scalar
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 7881065513688450684, guid: 2400ddc348718ce4b8a5031f7ab68b67, type: 3}
       propertyPath: VelocityModule.inWorldSpace

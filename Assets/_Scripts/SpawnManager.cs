@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class SpawnManager : MonoBehaviour
 {
@@ -22,7 +23,7 @@ public class SpawnManager : MonoBehaviour
 
     public static float projectileSpeed;
 
-    private float duration;
+    public Image timeBar;
 
     private float timeLimit = 17f;
 
@@ -30,21 +31,13 @@ public class SpawnManager : MonoBehaviour
 
     public GameObject textBackground;
 
-    TextMeshProUGUI projectileText;
-
     TextMeshProUGUI levelText;
 
     TextMeshProUGUI dangerText;
 
-    TextMeshProUGUI timeText;
-
     private CenterController centerController;
 
     private LevelManager levelManager;
-
-    public GameObject gameWinPanel;
-
-    public GameObject gameOverPanel;
 
     public bool reverserLevel;
 
@@ -52,11 +45,11 @@ public class SpawnManager : MonoBehaviour
     void Start()
     {
 
-        projectileSpeed = Random.Range(1.3f, 2.5f);
+        projectileSpeed = Random.Range(2.2f, 3f);
 
         levelManager = FindObjectOfType<LevelManager>();
 
-        levelManager.levelWin = false;
+        LevelManager.levelWin = false;
 
         obstacle = levelManager.obstacle;
 
@@ -72,19 +65,14 @@ public class SpawnManager : MonoBehaviour
 
         LevelManager.projectileCount = ProjectileCountForLevel();
 
-        projectileText = GameObject.Find("Projectile Text").GetComponent<TextMeshProUGUI>();
-
-        projectileText.text = (LevelManager.projectileCount - sendedProjectile).ToString() + " Arrows Left";
-
         levelText = GameObject.FindGameObjectWithTag("Level Text").GetComponent<TextMeshProUGUI>();
-
-        timeText = GameObject.Find("Time Text").GetComponent<TextMeshProUGUI>();
 
         levelText.text = LevelManager.level.ToString();
 
         if (LevelManager.level >= 10)
         {
-            levelText.rectTransform.rect.Set(3,0,44,44);
+            //levelText.rectTransform.rect.Set(3, 0, 44, 44);
+            levelText.rectTransform.anchoredPosition = new Vector2(3, levelText.rectTransform.anchoredPosition.y);
         }
 
         dangerText = GameObject.Find("Danger Text").GetComponent<TextMeshProUGUI>();
@@ -95,15 +83,7 @@ public class SpawnManager : MonoBehaviour
 
         textBackground.SetActive(false);
 
-        timeText.gameObject.SetActive(false);
-
         RotateSpeedForLevel();
-
-
-        gameWinPanel = GameObject.FindGameObjectWithTag("Game Win Panel");
-        gameWinPanel.SetActive(false);
-        gameOverPanel = GameObject.FindGameObjectWithTag("Game Over Panel");
-        gameOverPanel.SetActive(false);
 
         GameManager.gameOver = false;
 
@@ -111,55 +91,65 @@ public class SpawnManager : MonoBehaviour
 
         reverserLevel = false;
 
-        if (LevelManager.level > 4)
+        if (LevelManager.level > 4 && LevelManager.level != 8 && LevelManager.level != 14 && LevelManager.level != 3 && LevelManager.level != 18)
         {
-            if (LevelManager.level / 3 <= 5)
+            if(LevelManager.level == 20)
             {
-                SpawnObstacles(obstacle, (LevelManager.level / 3) + 1);
+                SpawnObstacles(obstacle, 3);
             }
             else
             {
-                SpawnObstacles(obstacle, 5);
+                SpawnObstacles(obstacle, (LevelManager.level / 3) + 1);
             }
         }
 
-        if (LevelManager.level % 5 == 0 && LevelManager.level % 3 != 0 && LevelManager.level > 4)
+        if (LevelManager.level % 5 == 0 && LevelManager.level % 3 != 0 && LevelManager.level %4 != 0 && LevelManager.level > 4)
         {
             reverserLevel = true;
             StartCoroutine(OpenDangerText());
             dangerText.text = "Speed Will Change When You Fire ";
         }
 
-        if (LevelManager.level % 4 == 0 && LevelManager.level%12 != 0 && LevelManager.level > 3)
+        if (LevelManager.level % 4 == 0 && LevelManager.level % 12 != 0 && LevelManager.level > 8)
         {
             StartCoroutine(OpenDangerText());
             StartCoroutine(AutoChangingSpeed());
-
         }
 
 
-        if (LevelManager.level %3 == 0 && LevelManager.level > 2)
+        if (LevelManager.level % 3 == 0 && LevelManager.level > 3 && LevelManager.level != 18 || LevelManager.level == 2)
         {
             StartCoroutine(TimeLimitLevel());
         }
 
-        if (LevelManager.level % 7 == 0 && LevelManager.level > 6)
+        if (LevelManager.level % 7 == 0 && LevelManager.level > 6 && LevelManager.level != 14)
         {
             StartCoroutine(AutoReversingSpeed());
         }
 
 
 
-        if (LevelManager.level == 16) // Dark Level
+        if (LevelManager.level == 3) // Dark Level
+        {
+            projectile = levelManager.projectileLighting;
+        }
+        else if (LevelManager.level == 8)
+        {
+            projectile = levelManager.projectileLighting;
+        }
+        else if (LevelManager.level == 14)
+        {
+            projectile = levelManager.projectileLighting;
+        }
+        else if (LevelManager.level == 18)
+        {
+            projectile = levelManager.projectileLighting;
+        }
+        else if (LevelManager.level == 20)
         {
             projectile = levelManager.projectileLighting;
             light = GameObject.Find("Directional Light").GetComponent<Light>();
             StartCoroutine(AutoLight());
-
-        }
-        else if (LevelManager.level == 4)
-        {
-            projectile = levelManager.projectileLighting;
         }
         else // other levels
         {
@@ -178,15 +168,6 @@ public class SpawnManager : MonoBehaviour
         {
             SpawnProjectile(projectile);
             sendedProjectile++;
-            projectileText.text = (LevelManager.projectileCount - sendedProjectile).ToString() + " Arrows Left";
-            if (LevelManager.projectileCount - sendedProjectile == 0)
-            {
-                Destroy(projectileText.gameObject);
-            }
-            else if (LevelManager.projectileCount - sendedProjectile == 1)
-            {
-                projectileText.text = "1 Arrow Left";
-            }
             DestroyArrowImage();
             canShoot = false;
 
@@ -195,15 +176,6 @@ public class SpawnManager : MonoBehaviour
         {
             SpawnReverserProjectile(projectile);
             sendedProjectile++;
-            projectileText.text = (LevelManager.projectileCount - sendedProjectile).ToString() + " Arrows Left";
-            if (LevelManager.projectileCount - sendedProjectile == 0)
-            {
-                Destroy(projectileText.gameObject);
-            }
-            else if (LevelManager.projectileCount - sendedProjectile == 1)
-            {
-                projectileText.text = "1 Arrow Left";
-            }
             DestroyArrowImage();
             canShoot = false;
         }
@@ -213,12 +185,15 @@ public class SpawnManager : MonoBehaviour
     void CalculateArrowCount()
     {
         int y = 0;
-        for (int i = 1; i < arrowCountImages.Length +1; i++)
+        for (int i = 1; i < arrowCountImages.Length + 1; i++)
         {
             if (i >= LevelManager.projectileCount)
-            { 
-                Destroy(arrowCountImages[LevelManager.projectileCount + y]);
-                y++;
+            {
+                y = i;
+                if (y < arrowCountImages.Length)
+                {
+                    Destroy(arrowCountImages[y].gameObject);
+                }
             }
         }
     }
@@ -239,8 +214,8 @@ public class SpawnManager : MonoBehaviour
         }
         else
         {
-           GameObject lightArrow = Instantiate(selectedProjectile, spawnPosition, selectedProjectile.transform.rotation);
-          // Destroy(lightArrow.transform.GetComponentInChildren(typeof(Light)).gameObject , 2f);
+            GameObject lightArrow = Instantiate(selectedProjectile, spawnPosition, selectedProjectile.transform.rotation);
+            // Destroy(lightArrow.transform.GetComponentInChildren(typeof(Light)).gameObject , 2f);
         }
     }
 
@@ -258,7 +233,7 @@ public class SpawnManager : MonoBehaviour
 
             float radius = 2f; // merkezden ne kadar uzakta spawn olmasýný istediðimiz deðer.
 
-            Vector3 spawnPos = new Vector3((Mathf.Cos(angle) * radius) + center.transform.localPosition.x, center.transform.position.y , (Mathf.Sin(angle) * radius)+ center.transform.localPosition.z); 
+            Vector3 spawnPos = new Vector3((Mathf.Cos(angle) * radius) + center.transform.localPosition.x, center.transform.position.y, (Mathf.Sin(angle) * radius) + center.transform.localPosition.z);
             // Burayý Türkçe'ye çevirmem biraz zor deneme yanýlma ile yazdým bu formülü :D , deðiþen açýya göre center'ýn etrafýnda pozisyonlar oluþturuyoruz.
 
             GameObject createdObstacle = Instantiate(obstacle, spawnPos, obstacle.transform.rotation, center.transform); // Oluþan pozisyonlarda objelerimizi spawnlýyoruz ve onlara createdObstacle adýný atýyoruz.
@@ -283,9 +258,11 @@ public class SpawnManager : MonoBehaviour
 
         while (true)
         {
-            float randomTime = Random.Range(2.3f, 3.7f);
+            float randomTime = Random.Range(2.3f, 3.4f);
             yield return new WaitForSecondsRealtime(randomTime);
-            centerController.rotateSpeed = Random.Range(-90, 90f);
+            centerController.rotateSpeed *= 2f;
+            yield return new WaitForSecondsRealtime(randomTime);
+            centerController.rotateSpeed /= 2f;
         }
     }
 
@@ -313,16 +290,14 @@ public class SpawnManager : MonoBehaviour
     IEnumerator TimeLimitLevel()
     {
         StartCoroutine(OpenDangerText());
-        timeText.gameObject.SetActive(true);
-        timeText.text = timeLimit.ToString() + " Seconds Left";
         dangerText.text = "You Have " + (int)timeLimit + "Seconds To Pass This Level !";
         while (true)
         {
             yield return new WaitForFixedUpdate();
-            timeText.text = (int)timeLimit + " Seconds Left";
-            if (sendedProjectile >=1)
+            if (sendedProjectile >= 1)
             {
                 timeLimit -= Time.deltaTime;
+                timeBar.fillAmount = timeLimit / 17;
                 if (timeLimit <= 0)
                 {
                     GameManager.gameOver = true;
@@ -345,7 +320,7 @@ public class SpawnManager : MonoBehaviour
             }
             yield return new WaitForSecondsRealtime(2.5f);
             light.gameObject.SetActive(true);
-            yield return new WaitForSecondsRealtime(0.35f);
+            yield return new WaitForSecondsRealtime(0.4f);
             light.gameObject.SetActive(false);
         }
     }
@@ -368,7 +343,7 @@ public class SpawnManager : MonoBehaviour
         }
         else if (LevelManager.level == 3)
         {
-            return 25;
+            return 23;
         }
         else if (LevelManager.level == 4)
         {
@@ -380,20 +355,37 @@ public class SpawnManager : MonoBehaviour
         }
         else if (LevelManager.level == 6)
         {
-            return 24;
+            return 22;
+        }
+        else if (LevelManager.level == 20)
+        {
+            return 14;
         }
         else
         {
             int x;
-            if (LevelManager.level >= 10)
+            if (LevelManager.level >= 7 && LevelManager.level < 10)
             {
-                x = Random.Range(14, 17);
+                x = Random.Range(15, 17);
+            }
+            else if (LevelManager.level >= 10 && LevelManager.level < 13)
+            {
+                x = Random.Range(15, 19);
+
+            }
+            else if(LevelManager.level >= 13 && LevelManager.level < 17)
+            {
+                x = Random.Range(16, 22);
+
+            }
+            else if (LevelManager.level >= 17 && LevelManager.level <20)
+            {
+                x = Random.Range(19, 22);
 
             }
             else
             {
-                x = Random.Range(14, 21);
-
+                x = 18;
             }
             return x;
         }
@@ -415,7 +407,7 @@ public class SpawnManager : MonoBehaviour
         }
         else if (LevelManager.level == 4)
         {
-            centerController.rotateSpeed = -90f;
+            centerController.rotateSpeed = -40f;
         }
         else if (LevelManager.level == 5)
         {
@@ -429,7 +421,7 @@ public class SpawnManager : MonoBehaviour
         {
             if (centerController)
             {
-                float x =Random.Range(-77, 77);
+                float x = Random.Range(-77, 77);
                 if (Mathf.Abs(x) <= 10 && Mathf.Abs(x) >= 5)
                 {
                     x *= 3.4f;
@@ -438,7 +430,14 @@ public class SpawnManager : MonoBehaviour
                 {
                     x = 33;
                 }
-
+                else if ((Mathf.Abs(x) <= 15 && Mathf.Abs(x) > 10))
+                {
+                    x *= 3.5f;
+                }
+                else if ((Mathf.Abs(x) <= 25 && Mathf.Abs(x) > 15))
+                {
+                    x *= 2f;
+                }
                 centerController.rotateSpeed = x;
             }
         }

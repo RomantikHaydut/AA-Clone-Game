@@ -9,6 +9,8 @@ public class MenuManager : MonoBehaviour
 {
     public TextMeshProUGUI buttonLevelText;
 
+    public TextMeshProUGUI failSuccessText;
+
     public GameObject firstLevelButton;
 
 
@@ -16,21 +18,39 @@ public class MenuManager : MonoBehaviour
     {
         if (LevelManager.level == 0)
         {
-            buttonLevelText.text = "LeveL" + 1;
+            LevelManager.level = 1;
+            buttonLevelText.text = "LeveL" + LevelManager.level;
         }
         else
         {
             buttonLevelText.text = "LeveL" + LevelManager.level;
         }
 
+        failSuccessText.gameObject.SetActive(true);
+        if (LevelManager.lastLevelWin)
+        {
+            failSuccessText.text = "Success :)";
+        }
+        else
+        {
+            failSuccessText.text = "Fail !!!";
+        }
 
         if (GameManager.gameStarted)
         {
             Destroy(firstLevelButton);
+            GameObject button = buttonLevelText.transform.parent.gameObject;
+            button.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
+        }
+        else
+        {
+            failSuccessText.gameObject.SetActive(false);
         }
         if (LevelManager.level == 1 || LevelManager.level == 0)
         {
             Destroy(firstLevelButton);
+            GameObject button = buttonLevelText.transform.parent.gameObject;
+            button.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
         }
     }
 

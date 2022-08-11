@@ -32,10 +32,6 @@ public class ProjectileController : MonoBehaviour
     void Start()
     {
         trailOn = false;
-        if (LevelManager.level > 7)
-        {
-            trailOn = true;
-        }
         spawner = FindObjectOfType<SpawnManager>().gameObject;
         tails = transform.GetChild(0).gameObject;
         tails.SetActive(false);
@@ -62,16 +58,18 @@ public class ProjectileController : MonoBehaviour
         {
             myParent.transform.localScale = new Vector3(myParent.transform.localScale.x * 1.4f, myParent.transform.localScale.y * 1.4f, myParent.transform.localScale.z * 1.15f);
         }
-        print(speed);
 
     }
 
     private void FixedUpdate()
     {
-        if (!onCenter && !myParent.GetComponent<CenterController>())
+        if (myParent)
         {
-            turnSpeed = 450;
-            myParent.transform.Rotate(Vector3.forward * turnSpeed * Time.deltaTime);
+            if (!onCenter && !myParent.GetComponent<CenterController>() && rb.velocity.magnitude > 0)
+            {
+                turnSpeed = 450;
+                myParent.transform.Rotate(Vector3.forward * turnSpeed * Time.deltaTime);
+            }
         }
     }
 
@@ -80,14 +78,17 @@ public class ProjectileController : MonoBehaviour
         if (other.gameObject.CompareTag("Center") && !GameManager.gameOver)
         {
             rb.velocity = Vector3.zero;
+            Transform hitPos = GameObject.FindGameObjectWithTag("Hit Position").transform;
+            transform.position = new Vector3(hitPos.position.x, transform.position.y, hitPos.position.z);
             transform.parent = other.gameObject.transform;
             Destroy(myParent);
+            levelManager.StopSound();
             levelManager.PlayHitSound();
             if (SpawnManager.sendedProjectile >= LevelManager.projectileCount)
             {
                 Destroy(GameObject.FindGameObjectWithTag("Thrower"));
                 StartCoroutine(FindObjectOfType<CenterController>().GoBig());
-                levelManager.levelWin = true;
+                LevelManager.levelWin = true;
                 levelManager.LevelWin();
                 GameManager.gameOver = true;
             }
@@ -101,12 +102,14 @@ public class ProjectileController : MonoBehaviour
             }
             SpawnManager.canShoot = true;
         }
-        else if ((other.gameObject.CompareTag("Projectile") || other.gameObject.CompareTag("Obstacle")) && !levelManager.levelWin && !GameManager.gameOver && rb.velocity.magnitude > 0f)
+        else if ((other.gameObject.CompareTag("Projectile") || other.gameObject.CompareTag("Obstacle")) && !LevelManager.levelWin && !GameManager.gameOver && rb.velocity.magnitude > 0f)
         {
+            LevelManager.levelWin = false;
             rb.velocity = Vector3.zero;
             GameManager.gameOver = true;
             transform.parent = GameObject.FindGameObjectWithTag("Center").transform;
             Destroy(myParent);
+            levelManager.StopSound();
             levelManager.PlayHitSound();
             StartCoroutine(FindObjectOfType<CenterController>().GoSmall());
             ParticleSystem effect = Instantiate(badHitEffect, other.ClosestPoint(transform.position), badHitEffect.transform.rotation,other.gameObject.transform.root);

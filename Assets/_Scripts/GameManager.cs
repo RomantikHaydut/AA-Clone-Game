@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            LoadLevel();
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -26,7 +25,6 @@ public class GameManager : MonoBehaviour
         }
 
     }
-
 
 
     [System.Serializable]
