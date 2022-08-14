@@ -164,20 +164,23 @@ public class SpawnManager : MonoBehaviour
 
     void Update()
     {
-        if (SimpleInput.GetMouseButtonDown(0) && !GameManager.gameOver && canShoot && !reverserLevel)
+        if (Input.touchCount > 0)
         {
-            SpawnProjectile(projectile);
-            sendedProjectile++;
-            DestroyArrowImage();
-            canShoot = false;
+            if (Input.GetTouch(0).phase == TouchPhase.Began && !GameManager.gameOver && canShoot && !reverserLevel) // Use SýmpleInput for mobile.
+            {
+                SpawnProjectile(projectile);
+                sendedProjectile++;
+                DestroyArrowImage();
+                canShoot = false;
 
-        }
-        else if (SimpleInput.GetMouseButtonDown(0) && !GameManager.gameOver && canShoot && reverserLevel)
-        {
-            SpawnReverserProjectile(projectile);
-            sendedProjectile++;
-            DestroyArrowImage();
-            canShoot = false;
+            }
+            else if (Input.GetTouch(0).phase == TouchPhase.Began && !GameManager.gameOver && canShoot && reverserLevel)
+            {
+                SpawnReverserProjectile(projectile);
+                sendedProjectile++;
+                DestroyArrowImage();
+                canShoot = false;
+            }
         }
 
     }
@@ -357,6 +360,14 @@ public class SpawnManager : MonoBehaviour
         {
             return 22;
         }
+        else if (LevelManager.level == 14)
+        {
+            return 23;
+        }
+        else if (LevelManager.level == 18)
+        {
+            return 25;
+        }
         else if (LevelManager.level == 20)
         {
             return 14;
@@ -393,54 +404,58 @@ public class SpawnManager : MonoBehaviour
 
     void RotateSpeedForLevel()
     {
-        if (LevelManager.level == 1)
+        if (centerController != null)
         {
-            centerController.rotateSpeed = 45f;
-        }
-        else if (LevelManager.level == 2)
-        {
-            centerController.rotateSpeed = -52f;
-        }
-        else if (LevelManager.level == 3)
-        {
-            centerController.rotateSpeed = 35f;
-        }
-        else if (LevelManager.level == 4)
-        {
-            centerController.rotateSpeed = -40f;
-        }
-        else if (LevelManager.level == 5)
-        {
-            centerController.rotateSpeed = 45f;
-        }
-        else if (LevelManager.level == 6)
-        {
-            centerController.rotateSpeed = -42f;
-        }
-        else
-        {
-            if (centerController)
+            if (LevelManager.level == 1)
             {
-                float x = Random.Range(-77, 77);
-                if (Mathf.Abs(x) <= 10 && Mathf.Abs(x) >= 5)
+                centerController.rotateSpeed = 45f;
+            }
+            else if (LevelManager.level == 2)
+            {
+                centerController.rotateSpeed = -52f;
+            }
+            else if (LevelManager.level == 3)
+            {
+                centerController.rotateSpeed = 35f;
+            }
+            else if (LevelManager.level == 4)
+            {
+                centerController.rotateSpeed = -40f;
+            }
+            else if (LevelManager.level == 5)
+            {
+                centerController.rotateSpeed = 45f;
+            }
+            else if (LevelManager.level == 6)
+            {
+                centerController.rotateSpeed = -42f;
+            }
+            else
+            {
+                if (centerController !=null)
                 {
-                    x *= 3.4f;
+                    float x = Random.Range(-77, 77);
+                    if (Mathf.Abs(x) <= 10 && Mathf.Abs(x) >= 5)
+                    {
+                        x *= 3.4f;
+                    }
+                    else if (Mathf.Abs(x) < 5)
+                    {
+                        x = 33;
+                    }
+                    else if ((Mathf.Abs(x) <= 15 && Mathf.Abs(x) > 10))
+                    {
+                        x *= 3.5f;
+                    }
+                    else if ((Mathf.Abs(x) <= 25 && Mathf.Abs(x) > 15))
+                    {
+                        x *= 2f;
+                    }
+                    centerController.rotateSpeed = x;
                 }
-                else if (Mathf.Abs(x) < 5)
-                {
-                    x = 33;
-                }
-                else if ((Mathf.Abs(x) <= 15 && Mathf.Abs(x) > 10))
-                {
-                    x *= 3.5f;
-                }
-                else if ((Mathf.Abs(x) <= 25 && Mathf.Abs(x) > 15))
-                {
-                    x *= 2f;
-                }
-                centerController.rotateSpeed = x;
             }
         }
     }
+        
 
 }
